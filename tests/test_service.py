@@ -9,12 +9,27 @@ from unittest.mock import Mock
 
 class TestPaymentPlan(unittest.TestCase):
 
+    def setUp(self) -> None:
+        self._debt_id_0 = Debt(id=0, amount=123.46)
+
+        self._payment_plan_0 = {
+            0: PaymentPlan(
+                id=1,
+                debt_id=0,
+                amount_to_pay=123.46,
+                installment_frecuency="Weekly",
+                installment_amount=50.00,
+                start_date=date(2021,8,10),
+            )
+        }
+
+
     def test_is_in_active_plan_equal_false_debts_has_not_active_payment_plan(self):
         repository = Mock(spec=ProcessedDebtRepository)
 
         service = ProcessDebtsService(repository=repository)
 
-        repository.get_debts.return_value = [Debt(id=0, amount=123.46)]
+        repository.get_debts.return_value = [self._debt_id_0]
         repository.get_payments_plans.return_value = {}
 
         actual = service.analize_debt()
@@ -27,17 +42,8 @@ class TestPaymentPlan(unittest.TestCase):
 
         service = ProcessDebtsService(repository=repository)
 
-        repository.get_debts.return_value = [Debt(id=0, amount=123.46)]
-        repository.get_payments_plans.return_value = {
-            0: PaymentPlan(
-                id=1,
-                debt_id=0,
-                amount_to_pay=123.46,
-                installment_frecuency="Weekly",
-                installment_amount=50.00,
-                start_date=date(2021,8,10),
-            )
-        }
+        repository.get_debts.return_value = [self._debt_id_0]
+        repository.get_payments_plans.return_value = self._payment_plan_0
 
         actual = service.analize_debt()
 
@@ -49,12 +55,12 @@ class TestPaymentPlan(unittest.TestCase):
 
         service = ProcessDebtsService(repository=repository)
 
-        repository.get_debts.return_value = [Debt(id=0, amount=123.46)]
+        repository.get_debts.return_value = [self._debt_id_0]
         repository.get_payments_plans.return_value = {
             0: PaymentPlan(
                 id=0,
                 debt_id=0,
-                amount_to_pay=102.25,
+                amount_to_pay=102.50,
                 installment_frecuency="Weekly",
                 installment_amount=51.25,
                 start_date=date(2021,8,10),

@@ -33,4 +33,19 @@ class ProcessDebtsService:
         payments: Dict[int, List[Payment]]
     ) -> bool:
 
+        if self._totals_from_payments_and_payments_plans == 0:
+            return False
+        
         return  actualdebt_id in payment_plans
+
+    def _totals_from_payments_and_payments_plans(
+        self, 
+        actualdebt_id: int, 
+        payment_plans: Dict[int, PaymentPlan], 
+        payments: Dict[int, List[Payment]]
+    ) -> int:
+        payment_plan_id = payment_plans[actualdebt_id].id
+        return sum(
+            amount_payment_do_it.amount 
+            for amount_payment_do_it in payments[payment_plan_id]
+            ) - payment_plans[actualdebt_id].amount_to_pay
