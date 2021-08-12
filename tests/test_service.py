@@ -25,7 +25,7 @@ class TestPaymentPlan(unittest.TestCase):
         }
 
         self._payment_plan_1 = {
-            0: PaymentPlan(
+            1: PaymentPlan(
                 id=1,
                 debt_id=1,
                 amount_to_pay=100,
@@ -108,7 +108,21 @@ class TestPaymentPlan(unittest.TestCase):
 
         self.assertFalse(actual[0].is_in_payment_plan)
 
-    
+
+    def test_remaining_amount_equal_initial_debts_when_debts_has_not_active_payment_plan(self):
+        repository = Mock(spec=ProcessedDebtRepository)
+
+        service = ProcessDebtsService(repository=repository)
+
+        repository.get_debts.return_value = [self._debt_id_0]
+        repository.get_payments_plans.return_value = {}
+        repository.get_payments.return_value = {}
+
+        actual = service.analize_debt()
+
+        self.assertEqual(actual[0].remaining_amount, self._debt_id_0.amount)
+
+        
     def test_remaining_amount_equal_50_to_pay(self):
         repository = Mock(spec=ProcessedDebtRepository)
 
@@ -121,6 +135,19 @@ class TestPaymentPlan(unittest.TestCase):
         actual = service.analize_debt()
 
         self.assertEqual(actual[0].remaining_amount, 50)
+
+    def test_remaining_amount_debt_with_payment_plan_but_without_payments(self):
+        repository = Mock(spec=ProcessedDebtRepository)
+
+        service = ProcessDebtsService(repository=repository)
+
+        repository.get_debts.return_value = [self._debt_id_0]
+        repository.get_payments_plans.return_value = self._payment_plan_0
+        repository.get_payments.return_value = {}
+
+        actual = service.analize_debt()
+
+        self.assertEqual(actual[0].remaining_amount, 102.50)
 
 
 if __name__ == "__main__":

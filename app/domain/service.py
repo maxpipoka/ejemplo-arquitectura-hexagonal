@@ -1,5 +1,5 @@
 from typing import Dict, List
-from app.domain.auxiliar_classes import DebtProcessed, Payment, PaymentPlan
+from app.domain.auxiliar_classes import Debt, DebtProcessed, Payment, PaymentPlan
 from app.domain.repository import ProcessedDebtRepository
 
 
@@ -16,10 +16,12 @@ class ProcessDebtsService:
         payments = self._repository.get_payments()
 
         for actualdebt in debts:
-            is_in_payment_plan = self._is_in_payment_plan(actualdebt.id, payment_plans, payments)
+            remaining_amount = self._remaining_amount(actualdebt, payment_plans, payments)
+            is_in_payment_plan = self._is_in_payment_plan(actualdebt.id, payment_plans, remaining_amount)
             processed_debt = DebtProcessed(
                 debt=actualdebt,
-                is_in_payment_plan=is_in_payment_plan
+                is_in_payment_plan=is_in_payment_plan,
+                remaining_amount=remaining_amount,
             )
             debts_processeds.append(processed_debt)
 
@@ -30,26 +32,34 @@ class ProcessDebtsService:
         self, 
         actualdebt_id: int, 
         payment_plans: Dict[int, PaymentPlan], 
-        payments: Dict[int, List[Payment]]
+        remaining_amount: float,
     ) -> bool:
         
-        if (actualdebt_id in payment_plans) and (payment_plans[actualdebt_id].id in payments):
-            if self._totals_from_payments_and_payments_plans(actualdebt_id, payment_plans, payments) == 0:
+        if remaining_amount == 0:
                 return False
             
         return  actualdebt_id in payment_plans
 
 
-    def _totals_from_payments_and_payments_plans(
+    def _remaining_amount(
         self, 
-        actualdebt_id: int, 
+        actualdebt: Debt, 
         payment_plans: Dict[int, PaymentPlan], 
-        payments: Dict[int, List[Payment]]
+        payments: Dict[int, List[Payment]],
     ) -> float:
 
-        payment_plan_id = payment_plans[actualdebt_id].id
+        remaining_amount = actualdebt.amount
+        
+        if actualdebt.id in payment_plans:
+            remaining_amount = payment_plans[actualdebt.id].amount_to_pay
+            payment_plan_id = payment_plans[actualdebt.id].id
 
-        return sum(
-            amount_payment_do_it.amount 
-            for amount_payment_do_it in payments[payment_plan_id]
-            ) - payment_plans[actualdebt_id].amount_to_pay
+            if  payment_plan_id in payments:   
+                remaining_amount = payment_plans[actualdebt.id].amount_to_pay - sum(
+                    amount_payment_do_it.amount 
+                    for amount_payment_do_it in payments[payment_plan_id]
+                )
+
+        return remaining_amount
+
+    
