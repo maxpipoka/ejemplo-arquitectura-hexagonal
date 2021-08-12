@@ -31,3 +31,4 @@ class DebtProcessed:
     debt: Debt 
     is_in_payment_plan: bool
     remaining_amount: float
+    next_payment_due_date: date

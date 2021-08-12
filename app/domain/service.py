@@ -18,10 +18,12 @@ class ProcessDebtsService:
         for actualdebt in debts:
             remaining_amount = self._remaining_amount(actualdebt, payment_plans, payments)
             is_in_payment_plan = self._is_in_payment_plan(actualdebt.id, payment_plans, remaining_amount)
+            next_payment_due_date = self._next_payment_due_date(actualdebt, payment_plans, payments)
             processed_debt = DebtProcessed(
                 debt=actualdebt,
                 is_in_payment_plan=is_in_payment_plan,
                 remaining_amount=remaining_amount,
+                next_payment_due_date=next_payment_due_date,
             )
             debts_processeds.append(processed_debt)
 
@@ -62,4 +64,12 @@ class ProcessDebtsService:
 
         return remaining_amount
 
-    
+    def _next_payment_due_date(
+        self,
+        actualdebt: Debt,
+        payment_plans: Dict[int, PaymentPlan],
+        payments: Dict[int, List[Payment]],
+    ): 
+        
+        
+        return None

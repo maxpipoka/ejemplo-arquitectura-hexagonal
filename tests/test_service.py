@@ -18,7 +18,7 @@ class TestPaymentPlan(unittest.TestCase):
                 id=0,
                 debt_id=0,
                 amount_to_pay=102.50,
-                installment_frecuency="Weekly",
+                installment_frecuency="WEEKLY",
                 installment_amount=51.25,
                 start_date=date(2020,9,28),
             )
@@ -29,7 +29,7 @@ class TestPaymentPlan(unittest.TestCase):
                 id=1,
                 debt_id=1,
                 amount_to_pay=100,
-                installment_frecuency="Weekly",
+                installment_frecuency="WEEKLY",
                 installment_amount=25.00,
                 start_date=date(2020,8,1),
             )
@@ -148,6 +148,19 @@ class TestPaymentPlan(unittest.TestCase):
         actual = service.analize_debt()
 
         self.assertEqual(actual[0].remaining_amount, 102.50)
+
+    def test_next_payment_due_date_equal_to_null_debt_with_out_payment_plan(self):
+        repository = Mock(spec=ProcessedDebtRepository)
+
+        service = ProcessDebtsService(repository=repository)
+
+        repository.get_debts.return_value = [self._debt_id_1]
+        repository.get_payments_plans.return_value = {}
+        repository.get_payments.return_value = {}
+
+        actual = service.analize_debt()
+
+        self.assertEqual(actual[0].next_payment_due_date, None)
 
 
 if __name__ == "__main__":
