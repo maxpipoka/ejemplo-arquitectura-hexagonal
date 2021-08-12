@@ -1,4 +1,5 @@
-from typing import Dict, List
+from datetime import date
+from typing import Dict, List, Optional
 from app.domain.auxiliar_classes import Debt, DebtProcessed, Payment, PaymentPlan
 from app.domain.repository import ProcessedDebtRepository
 
@@ -69,7 +70,10 @@ class ProcessDebtsService:
         actualdebt: Debt,
         payment_plans: Dict[int, PaymentPlan],
         payments: Dict[int, List[Payment]],
-    ): 
-        
-        
-        return None
+    ) -> Optional[date]: 
+        next_payment_due_date: Optional[date] = None
+        if actualdebt.id in payment_plans:
+            next_payment_due_date = (payment_plans[actualdebt.id].start_date)
+            print(type(next_payment_due_date))
+
+        return next_payment_due_date

@@ -162,6 +162,20 @@ class TestPaymentPlan(unittest.TestCase):
 
         self.assertEqual(actual[0].next_payment_due_date, None)
 
+    
+    def test_next_payment_due_date_debt_with_payment_plan(self):
+        repository = Mock(spec=ProcessedDebtRepository)
+
+        service = ProcessDebtsService(repository=repository)
+
+        repository.get_debts.return_value = [self._debt_id_1]
+        repository.get_payments_plans.return_value = self._payment_plan_1
+        repository.get_payments.return_value = {}
+
+        actual = service.analize_debt()
+
+        self.assertEqual(actual[0].next_payment_due_date, date(2020,8,1))
+
 
 if __name__ == "__main__":
     unittest.main()
