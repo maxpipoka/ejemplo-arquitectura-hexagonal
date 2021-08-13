@@ -19,7 +19,7 @@ class ProcessDebtsService:
         for actualdebt in debts:
             remaining_amount = self._remaining_amount(actualdebt, payment_plans, payments)
             is_in_payment_plan = self._is_in_payment_plan(actualdebt.id, payment_plans, remaining_amount)
-            next_payment_due_date = self._next_payment_due_date(actualdebt, payment_plans, payments)
+            next_payment_due_date = self._next_payment_due_date(actualdebt, payment_plans, payments, is_in_payment_plan)
             processed_debt = DebtProcessed(
                 debt=actualdebt,
                 is_in_payment_plan=is_in_payment_plan,
@@ -70,10 +70,29 @@ class ProcessDebtsService:
         actualdebt: Debt,
         payment_plans: Dict[int, PaymentPlan],
         payments: Dict[int, List[Payment]],
+        is_in_payment_plan: bool,
     ) -> Optional[date]: 
+        
         next_payment_due_date: Optional[date] = None
-        if actualdebt.id in payment_plans:
-            next_payment_due_date = (payment_plans[actualdebt.id].start_date)
-            print(type(next_payment_due_date))
+        if is_in_payment_plan == True:
+            payment_plan_id = payment_plans[actualdebt.id].id
+            next_payment_due_date = self._calculate_next_due_date(payment_plans[actualdebt.id], payments[payment_plan_id])
 
         return next_payment_due_date
+
+
+
+    def _calculate_next_due_date(
+        self,
+        payment_plans: Dict[int, PaymentPlan],
+        payments: Dict[int, List[Payment]],
+
+    ) -> Date:
+        date_to_return = date(2020, 8, 15)
+        # order_payments = payments.sort()
+
+        return date_to_return
+# Hay que pasar el diccionario de pagos a lista en caso de plan activo
+# Hay que ordenar esa lista para que al ultimo quede la ultima fecha de pago
+# hay que calcular la proxima fecha de pago dependiendo la periodicidad del plan de pagos
+#  

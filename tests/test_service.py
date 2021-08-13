@@ -136,6 +136,7 @@ class TestPaymentPlan(unittest.TestCase):
 
         self.assertEqual(actual[0].remaining_amount, 50)
 
+
     def test_remaining_amount_debt_with_payment_plan_but_without_payments(self):
         repository = Mock(spec=ProcessedDebtRepository)
 
@@ -149,32 +150,33 @@ class TestPaymentPlan(unittest.TestCase):
 
         self.assertEqual(actual[0].remaining_amount, 102.50)
 
-    def test_next_payment_due_date_equal_to_null_debt_with_out_payment_plan(self):
+    
+    def test_next_payment_due_date_equal_to_null_debt_with_out_payment_plan_or_debt_paid_off(self):
         repository = Mock(spec=ProcessedDebtRepository)
 
         service = ProcessDebtsService(repository=repository)
 
-        repository.get_debts.return_value = [self._debt_id_1]
-        repository.get_payments_plans.return_value = {}
-        repository.get_payments.return_value = {}
+        repository.get_debts.return_value = [self._debt_id_0]
+        repository.get_payments_plans.return_value = self._payment_plan_0
+        repository.get_payments.return_value = self.payment_0
 
         actual = service.analize_debt()
 
         self.assertEqual(actual[0].next_payment_due_date, None)
 
-    
-    def test_next_payment_due_date_debt_with_payment_plan(self):
+
+    def test_next_payment_due_date_debt_with_active_payment_plan_with_payments_and_weekly_installent_frecuency(self):
         repository = Mock(spec=ProcessedDebtRepository)
 
         service = ProcessDebtsService(repository=repository)
 
         repository.get_debts.return_value = [self._debt_id_1]
         repository.get_payments_plans.return_value = self._payment_plan_1
-        repository.get_payments.return_value = {}
+        repository.get_payments.return_value = self.payment_1
 
         actual = service.analize_debt()
 
-        self.assertEqual(actual[0].next_payment_due_date, date(2020,8,1))
+        self.assertEqual(actual[0].next_payment_due_date, date(2020, 8, 15))
 
 
 if __name__ == "__main__":
