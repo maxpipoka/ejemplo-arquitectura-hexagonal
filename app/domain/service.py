@@ -89,11 +89,12 @@ class ProcessDebtsService:
         payments: List[Payment],
 
     ) -> date:
+
+        list_of_next_payments = 
         last_payment = max(x.date for x in payments)
         date_to_return = last_payment + timedelta(PayFrequency[payment_plan.installment_frecuency].value)
 
         return date_to_return
-# Hay que pasar el diccionario de pagos a lista en caso de plan activo
-# Hay que ordenar esa lista para que al ultimo quede la ultima fecha de pago
-# hay que calcular la proxima fecha de pago dependiendo la periodicidad del plan de pagos
-#  
+
+#habria que crear una lista de futuros pagos usando de base la fecha de inicio del plan con la periodicidad. 
+# Para luego comparar con la fecha efectiva de pago y determinar cual fecha omstrar.
