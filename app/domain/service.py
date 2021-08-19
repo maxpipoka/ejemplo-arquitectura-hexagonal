@@ -1,6 +1,6 @@
-from datetime import date
+from datetime import date, timedelta
 from typing import Dict, List, Optional
-from app.domain.auxiliar_classes import Debt, DebtProcessed, Payment, PaymentPlan
+from app.domain.auxiliar_classes import Debt, DebtProcessed, PayFrequency, Payment, PaymentPlan
 from app.domain.repository import ProcessedDebtRepository
 
 
@@ -74,22 +74,23 @@ class ProcessDebtsService:
     ) -> Optional[date]: 
         
         next_payment_due_date: Optional[date] = None
-        if is_in_payment_plan == True:
-            payment_plan_id = payment_plans[actualdebt.id].id
-            next_payment_due_date = self._calculate_next_due_date(payment_plans[actualdebt.id], payments[payment_plan_id])
+        if not is_in_payment_plan:
+            return next_payment_due_date
 
+        payment_plan_id = payment_plans[actualdebt.id].id
+        next_payment_due_date = self._calculate_next_due_date(payment_plans[actualdebt.id], payments[payment_plan_id])
         return next_payment_due_date
 
 
 
     def _calculate_next_due_date(
         self,
-        payment_plans: Dict[int, PaymentPlan],
-        payments: Dict[int, List[Payment]],
+        payment_plan: PaymentPlan,
+        payments: List[Payment],
 
-    ) -> Date:
-        date_to_return = date(2020, 8, 15)
-        # order_payments = payments.sort()
+    ) -> date:
+        last_payment = max(x.date for x in payments)
+        date_to_return = last_payment + timedelta(PayFrequency[payment_plan.installment_frecuency].value)
 
         return date_to_return
 # Hay que pasar el diccionario de pagos a lista en caso de plan activo

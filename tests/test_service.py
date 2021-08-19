@@ -12,6 +12,7 @@ class TestPaymentPlan(unittest.TestCase):
     def setUp(self) -> None:
         self._debt_id_0 = Debt(id=0, amount=123.46)
         self._debt_id_1 = Debt(id=1, amount=100)
+        self._debt_id_2 = Debt(id=2, amount=100)
 
         self._payment_plan_0 = {
             0: PaymentPlan(
@@ -20,7 +21,7 @@ class TestPaymentPlan(unittest.TestCase):
                 amount_to_pay=102.50,
                 installment_frecuency="WEEKLY",
                 installment_amount=51.25,
-                start_date=date(2020,9,28),
+                start_date=date(2020, 9, 28),
             )
         }
 
@@ -31,7 +32,18 @@ class TestPaymentPlan(unittest.TestCase):
                 amount_to_pay=100,
                 installment_frecuency="WEEKLY",
                 installment_amount=25.00,
-                start_date=date(2020,8,1),
+                start_date=date(2020, 8, 1),
+            )
+        }
+
+        self._payment_plan_2 = {
+            2: PaymentPlan(
+                id=2,
+                debt_id=2,
+                amount_to_pay=100,
+                installment_frecuency="BI_WEEKLY",
+                installment_amount=25.00,
+                start_date=date(2020, 8, 8),
             )
         }
 
@@ -62,6 +74,21 @@ class TestPaymentPlan(unittest.TestCase):
                     payment_plan_id=1,
                     amount=25,
                     date=date(2020, 8, 8)
+                ),
+            ]
+        }
+
+        self.payment_2 = {
+            2: [
+                Payment(
+                    payment_plan_id=2,
+                    amount=25,
+                    date=date(2020, 8, 8)
+                ),
+                Payment(
+                    payment_plan_id=2,
+                    amount=25,
+                    date=date(2020, 8, 16)
                 ),
             ]
         }
@@ -151,7 +178,21 @@ class TestPaymentPlan(unittest.TestCase):
         self.assertEqual(actual[0].remaining_amount, 102.50)
 
     
-    def test_next_payment_due_date_equal_to_null_debt_with_out_payment_plan_or_debt_paid_off(self):
+    def test_next_payment_due_date_equal_to_null_debt_with_out_payment_plan(self):
+        repository = Mock(spec=ProcessedDebtRepository)
+
+        service = ProcessDebtsService(repository=repository)
+
+        repository.get_debts.return_value = [self._debt_id_0]
+        repository.get_payments_plans.return_value = {}
+        repository.get_payments.return_value = {}
+
+        actual = service.analize_debt()
+
+        self.assertEqual(actual[0].next_payment_due_date, None)
+
+
+    def test_next_payment_due_date_equal_to_null_debt_paid_off(self):
         repository = Mock(spec=ProcessedDebtRepository)
 
         service = ProcessDebtsService(repository=repository)
@@ -163,6 +204,34 @@ class TestPaymentPlan(unittest.TestCase):
         actual = service.analize_debt()
 
         self.assertEqual(actual[0].next_payment_due_date, None)
+
+
+    def test_next_payment_due_date_debt_with_payment_in_time(self):
+        repository = Mock(spec=ProcessedDebtRepository)
+
+        service = ProcessDebtsService(repository=repository)
+
+        repository.get_debts.return_value = [self._debt_id_1]
+        repository.get_payments_plans.return_value = self._payment_plan_1
+        repository.get_payments.return_value = self.payment_1
+
+        actual = service.analize_debt()
+
+        self.assertEqual(actual[0].next_payment_due_date, date(2020, 8, 15))
+
+
+    def test_next_payment_due_date_debt_with_payment_out_of_time(self):
+        repository = Mock(spec=ProcessedDebtRepository)
+
+        service = ProcessDebtsService(repository=repository)
+
+        repository.get_debts.return_value = [self._debt_id_1]
+        repository.get_payments_plans.return_value = self._payment_plan_1
+        repository.get_payments.return_value = self.payment_1
+
+        actual = service.analize_debt()
+
+        self.assertEqual(actual[0].next_payment_due_date, date(2020, 8, 22))
 
 
     def test_next_payment_due_date_debt_with_active_payment_plan_with_payments_and_weekly_installent_frecuency(self):

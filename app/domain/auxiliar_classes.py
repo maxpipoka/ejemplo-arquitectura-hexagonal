@@ -1,6 +1,7 @@
 """Auxiliar classes"""
 from dataclasses import dataclass
 from datetime import date
+import enum
 
 
 @dataclass(frozen=True)
@@ -32,3 +33,8 @@ class DebtProcessed:
     is_in_payment_plan: bool
     remaining_amount: float
     next_payment_due_date: date
+
+
+class PayFrequency(enum.Enum):
+    WEEKLY = 7
+    BI_WEEKLY = 14
