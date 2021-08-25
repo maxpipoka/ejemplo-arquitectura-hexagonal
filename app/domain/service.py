@@ -90,11 +90,22 @@ class ProcessDebtsService:
 
     ) -> date:
 
-        list_of_next_payments = 
+        # list_of_next_payments = 
         last_payment = max(x.date for x in payments)
-        date_to_return = last_payment + timedelta(PayFrequency[payment_plan.installment_frecuency].value)
+        validated_date = False
+        i_date = 1
+        while (validated_date == False):
+            current_payment_due = payment_plan.start_date + (timedelta(PayFrequency[payment_plan.installment_frecuency].value) * i_date)
+            if (last_payment > current_payment_due) and ((last_payment - current_payment_due) < 7):
+                return current_payment_due
+            i_date =+ 1
+        # date_to_return = last_payment + timedelta(PayFrequency[payment_plan.installment_frecuency].value)
 
-        return date_to_return
+        # return date_to_return
 
-#habria que crear una lista de futuros pagos usando de base la fecha de inicio del plan con la periodicidad. 
-# Para luego comparar con la fecha efectiva de pago y determinar cual fecha omstrar.
+# Para evaluar los pagos post o pre fecha de vencimiento.
+# un bloque iterativo con un indice que multiplique la periodicidad del plan para sumar a la fecha dd inicio
+# de esta forma conseguir una fecha de vencimiento futura,.
+# Luego tomar la fecha del pago en ceustion, compararla con un If a la fecha de vencimiento:
+# si (fecha pago > fecha vencimiento) y ((fecha pago - fecha vencimiento) < 7) devolver la fecha de vencimiento
+#  
