@@ -10,40 +10,72 @@ from unittest.mock import Mock
 class TestPaymentPlan(unittest.TestCase):
 
     def setUp(self) -> None:
-        self._debt_id_0 = Debt(id=0, amount=123.46)
-        self._debt_id_1 = Debt(id=1, amount=100)
-        self._debt_id_2 = Debt(id=2, amount=100)
+        # self._debt_id_0 = Debt(id=0, amount=123.46)
+        # self._debt_id_1 = Debt(id=1, amount=100)
+        # self._debt_id_2 = Debt(id=2, amount=100)
+
+        self._debt_id_0 = Debt(
+            amount=123.46,
+            id=0, 
+            )
+        self._debt_id_1 = Debt(
+            amount=100,
+            id=1, 
+            )
+        self._debt_id_2 = Debt(
+            amount=4920.34,
+            id=2, 
+            )
+        self._debt_id_3 = Debt(
+            amount=12938,
+            id=3, 
+            )
+        self._debt_id_4 = Debt(
+            amount=9238.02,
+            id=4, 
+            )
 
         self._payment_plan_0 = {
             0: PaymentPlan(
-                id=0,
-                debt_id=0,
                 amount_to_pay=102.50,
-                installment_frecuency="WEEKLY",
+                debt_id=0,
+                id=0,
                 installment_amount=51.25,
+                installment_frecuency="WEEKLY",
                 start_date=date(2020, 9, 28),
             )
         }
 
         self._payment_plan_1 = {
             1: PaymentPlan(
-                id=1,
-                debt_id=1,
                 amount_to_pay=100,
-                installment_frecuency="WEEKLY",
+                debt_id=1,
+                id=1,
                 installment_amount=25.00,
+                installment_frecuency="WEEKLY",
                 start_date=date(2020, 8, 1),
             )
         }
 
         self._payment_plan_2 = {
             2: PaymentPlan(
-                id=2,
+                amount_to_pay=4920.34,
                 debt_id=2,
-                amount_to_pay=100,
+                id=2,
+                installment_amount=1230.085,
                 installment_frecuency="BI_WEEKLY",
-                installment_amount=25.00,
-                start_date=date(2020, 8, 8),
+                start_date=date(2020, 1, 1),
+            )
+        }
+        
+        self._payment_plan_3 = {
+            2: PaymentPlan(
+                amount_to_pay=4321.67,
+                debt_id=3,
+                id=3,
+                installment_amount=1230.085,
+                installment_frecuency="WEEKLY",
+                start_date=date(2020, 8, 1),
             )
         }
 
@@ -51,14 +83,14 @@ class TestPaymentPlan(unittest.TestCase):
         self.payment_0 = {
             0: [
                 Payment(
-                    payment_plan_id=0,
                     amount=51.25,
-                    date=date(2020, 9, 29)
+                    date=date(2020, 9, 29),
+                    payment_plan_id=0,
                 ),
                 Payment(
-                    payment_plan_id=0,
                     amount=51.25,
-                    date=date(2020, 10, 29)
+                    date=date(2020, 10, 29),
+                    payment_plan_id=0,
                 ),
             ]
         }
@@ -66,14 +98,14 @@ class TestPaymentPlan(unittest.TestCase):
         self.payment_1 = {
             1: [
                 Payment(
-                    payment_plan_id=1,
                     amount=25,
-                    date=date(2020, 8, 8)
+                    date=date(2020, 8, 8),
+                    payment_plan_id=1,
                 ),
                 Payment(
-                    payment_plan_id=1,
                     amount=25,
-                    date=date(2020, 8, 8)
+                    date=date(2020, 8, 8),
+                    payment_plan_id=1,
                 ),
             ]
         }
@@ -81,14 +113,29 @@ class TestPaymentPlan(unittest.TestCase):
         self.payment_2 = {
             2: [
                 Payment(
+                    amount=4312.67,
+                    date=date(2020, 8, 8),
                     payment_plan_id=2,
-                    amount=25,
-                    date=date(2020, 8, 8)
+                ),
+            ]
+        }
+
+        self.payment_3 = {
+            2: [
+                Payment(
+                    amount=1230.085,
+                    date=date(2020, 8, 1),
+                    payment_plan_id=3,
                 ),
                 Payment(
-                    payment_plan_id=2,
-                    amount=25,
-                    date=date(2020, 8, 16)
+                    amount=1230.085,
+                    date=date(2020, 8, 8),
+                    payment_plan_id=3,
+                ),
+                Payment(
+                    amount=1230.085,
+                    date=date(2020, 8, 15),
+                    payment_plan_id=3,
                 ),
             ]
         }

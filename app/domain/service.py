@@ -90,22 +90,31 @@ class ProcessDebtsService:
 
     ) -> date:
 
-        # list_of_next_payments = 
+
         last_payment = max(x.date for x in payments)
         validated_date = False
-        i_date = 1
+        pay_frecuency_iteration = len(payments) + 1
+        pay_frecuency = PayFrequency[payment_plan.installment_frecuency].value
         while (validated_date == False):
-            current_payment_due = payment_plan.start_date + (timedelta(PayFrequency[payment_plan.installment_frecuency].value) * i_date)
-            if (last_payment > current_payment_due) and ((last_payment - current_payment_due) < 7):
+            current_payment_due = payment_plan.start_date + (timedelta(pay_frecuency  * pay_frecuency_iteration))
+            if (last_payment < current_payment_due): #and ((last_payment - current_payment_due) < 7):
                 return current_payment_due
-            i_date =+ 1
-        # date_to_return = last_payment + timedelta(PayFrequency[payment_plan.installment_frecuency].value)
+            if (last_payment >= current_payment_due):
+                pay_frecuency_iteration += 1
 
-        # return date_to_return
 
-# Para evaluar los pagos post o pre fecha de vencimiento.
-# un bloque iterativo con un indice que multiplique la periodicidad del plan para sumar a la fecha dd inicio
-# de esta forma conseguir una fecha de vencimiento futura,.
-# Luego tomar la fecha del pago en ceustion, compararla con un If a la fecha de vencimiento:
-# si (fecha pago > fecha vencimiento) y ((fecha pago - fecha vencimiento) < 7) devolver la fecha de vencimiento
-#  
+# Solucionado lo de la comparacion de pagos.
+# Hay que tener en cuenta ahora la cantidad de pagos, para tambien aplicarlo a la cantidad de vencimientos
+
+# inicia deuda:
+# 2020-8-1
+
+# primer vencimiento: 2020-8-8
+# segund vencimiento: 2020-8-15
+# tercer vencimiento: 2020-8-21
+
+# el chavon hace 2 pagos el mismo dia: 2020-8-8
+
+# Tiene cubiertos los 2 primeros vencimientos, el siguiente deberia ser el 21
+# Si tomamos en cuenta solo el ultimo pago, va a informar que es el 15 el prox vencimiento
+
