@@ -78,7 +78,9 @@ class ProcessDebtsService:
             return next_payment_due_date
 
         payment_plan_id = payment_plans[actualdebt.id].id
-        next_payment_due_date = self._calculate_next_due_date(payment_plans[actualdebt.id], payments[payment_plan_id])
+
+        pay = payments[payment_plan_id] if payment_plan_id in payments else []
+        next_payment_due_date = self._calculate_next_due_date(payment_plans[actualdebt.id], pay)
         return next_payment_due_date
 
 
@@ -90,6 +92,8 @@ class ProcessDebtsService:
 
     ) -> date:
 
+        if len(payments) == 0:
+            return payment_plan.start_date
 
         last_payment = max(x.date for x in payments)
         validated_date = False

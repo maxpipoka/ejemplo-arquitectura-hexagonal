@@ -2,7 +2,6 @@ from datetime import date
 from app.domain.auxiliar_classes import Debt, Payment, PaymentPlan
 from app.domain.service import ProcessDebtsService
 from app.domain.repository import ProcessedDebtRepository
-from unittest import TestCase
 import unittest
 from unittest.mock import Mock
 
@@ -10,30 +9,27 @@ from unittest.mock import Mock
 class TestPaymentPlan(unittest.TestCase):
 
     def setUp(self) -> None:
-        # self._debt_id_0 = Debt(id=0, amount=123.46)
-        # self._debt_id_1 = Debt(id=1, amount=100)
-        # self._debt_id_2 = Debt(id=2, amount=100)
 
         self._debt_id_0 = Debt(
             amount=123.46,
             id=0, 
-            )
+        )
         self._debt_id_1 = Debt(
             amount=100,
             id=1, 
-            )
+        )
         self._debt_id_2 = Debt(
             amount=4920.34,
             id=2, 
-            )
+        )
         self._debt_id_3 = Debt(
             amount=12938,
             id=3, 
-            )
+        )
         self._debt_id_4 = Debt(
             amount=9238.02,
             id=4, 
-            )
+        )
 
         self._payment_plan_0 = {
             0: PaymentPlan(
@@ -264,7 +260,7 @@ class TestPaymentPlan(unittest.TestCase):
 
         actual = service.analize_debt()
 
-        self.assertEqual(actual[0].next_payment_due_date, date(2020, 8, 15))
+        self.assertEqual(actual[0].next_payment_due_date, date(2020, 8, 22))
 
 
     def test_next_payment_due_date_debt_with_payment_out_of_time(self):
@@ -292,7 +288,20 @@ class TestPaymentPlan(unittest.TestCase):
 
         actual = service.analize_debt()
 
-        self.assertEqual(actual[0].next_payment_due_date, date(2020, 8, 15))
+        self.assertEqual(actual[0].next_payment_due_date, date(2020, 8, 22))
+
+    def test_next_payment_due_date_debt_with_active_payment_plan_with_payments_and_biweekly_installent_frecuency(self):
+        repository = Mock(spec=ProcessedDebtRepository)
+
+        service = ProcessDebtsService(repository=repository)
+
+        repository.get_debts.return_value = [self._debt_id_2]
+        repository.get_payments_plans.return_value = self._payment_plan_2
+        repository.get_payments.return_value = self.payment_2
+
+        actual = service.analize_debt()
+
+        self.assertEqual(actual[0].next_payment_due_date, date(2020, 8, 12))
 
 
 if __name__ == "__main__":
