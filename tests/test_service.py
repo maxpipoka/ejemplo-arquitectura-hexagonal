@@ -37,7 +37,7 @@ class TestPaymentPlan(unittest.TestCase):
                 debt_id=0,
                 id=0,
                 installment_amount=51.25,
-                installment_frecuency="WEEKLY",
+                installment_frequency="WEEKLY",
                 start_date=date(2020, 9, 28),
             )
         }
@@ -48,7 +48,7 @@ class TestPaymentPlan(unittest.TestCase):
                 debt_id=1,
                 id=1,
                 installment_amount=25.00,
-                installment_frecuency="WEEKLY",
+                installment_frequency="WEEKLY",
                 start_date=date(2020, 8, 1),
             )
         }
@@ -59,18 +59,18 @@ class TestPaymentPlan(unittest.TestCase):
                 debt_id=2,
                 id=2,
                 installment_amount=1230.085,
-                installment_frecuency="BI_WEEKLY",
+                installment_frequency="BI_WEEKLY",
                 start_date=date(2020, 1, 1),
             )
         }
         
         self._payment_plan_3 = {
-            2: PaymentPlan(
+            3: PaymentPlan(
                 amount_to_pay=4321.67,
                 debt_id=3,
                 id=3,
                 installment_amount=1230.085,
-                installment_frecuency="WEEKLY",
+                installment_frequency="WEEKLY",
                 start_date=date(2020, 8, 1),
             )
         }
@@ -117,7 +117,7 @@ class TestPaymentPlan(unittest.TestCase):
         }
 
         self.payment_3 = {
-            2: [
+            3: [
                 Payment(
                     amount=1230.085,
                     date=date(2020, 8, 1),

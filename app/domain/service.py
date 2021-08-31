@@ -98,7 +98,7 @@ class ProcessDebtsService:
         last_payment = max(x.date for x in payments)
         validated_date = False
         pay_frecuency_iteration = len(payments) + 1
-        pay_frecuency = PayFrequency[payment_plan.installment_frecuency].value
+        pay_frecuency = PayFrequency[payment_plan.installment_frequency].value
         while (validated_date == False):
             current_payment_due = payment_plan.start_date + (timedelta(pay_frecuency  * pay_frecuency_iteration))
             if (last_payment < current_payment_due): #and ((last_payment - current_payment_due) < 7):

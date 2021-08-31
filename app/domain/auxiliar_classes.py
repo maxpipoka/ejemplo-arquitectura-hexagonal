@@ -15,7 +15,7 @@ class PaymentPlan:
     id: int
     debt_id: int
     amount_to_pay: float
-    installment_frecuency: str
+    installment_frequency: str
     installment_amount: float
     start_date: date
 
