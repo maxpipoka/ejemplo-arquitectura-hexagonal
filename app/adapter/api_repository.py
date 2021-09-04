@@ -1,5 +1,6 @@
-from app.adapter import ApiUrls
 import requests
+from app.adapter.create_from_raw import create_debts_from_raw, create_payment_plans_from_raw, create_payments_from_raw
+from app.adapter import ApiUrls, JsonError, NotRequestOkError
 
 from typing import List, Dict
 
@@ -14,57 +15,36 @@ class ApiRepository(ProcessedDebtRepository):
         """
         Return a Debts´s list.
         """
-        # DRY
-        raw_debts = self._get_raw_data(ApiUrls.DEBTS.value)
-
-        debts = []
-
-        for debt in raw_debts:
-            debts.append(Debt(
-                    id=debt["id"] ,
-                    amount=debt["amount"],
-                )
-            )
-        
-        return debts
-
-
-        temporary_debts = debt_object for debt_object in request
-
-        # SI ESTA CORRECTO, PROCESARLO PARA DARLE EL FORMATO DE Debt.
+        # print(ApiUrls.DEBTS.value)
+        # exit()
+        return create_debts_from_raw(self._get_raw_data(ApiUrls.DEBTS.value))
 
     def get_payments_plans(self) -> Dict[int, PaymentPlan]:
         """
         Return a Payment_plans´s list.
         Return Dict -> {debt_id, PaymentPlan}
         """
-
-        request = self._get_raw_data(ApiUrls.PAYMENT_PLANS.value)
-
-        # SI ESTA CORRECTO, PROCESARLO PARA DARLE EL FORMATO DE Payment_plan.
+        
+        return create_payment_plans_from_raw(self._get_raw_data(ApiUrls.PAYMENT_PLANS.value))
 
     def get_payments(self) -> Dict[int, List[Payment]]:
         """
         Return a Dict with int(payment_plans id´s)
         and a list of payments of that payment plan
         """
+        
+        return create_payments_from_raw(self._get_raw_data(ApiUrls.PAYMENTS.value))
 
-        request = self._get_raw_data(ApiUrls.PAYMENTS.value)
-
-        # SI ESTA CORRECTO, PROCESARLO PARA DARLE EL FORMATO DE Payment.
-
-    def _get_raw_data(source: str) -> List[Dict]:
+    def _get_raw_data(self, source: str) -> List[Dict]:
         request = requests.get(source, timeout=5, verify=True)
 
         if not request.ok: 
-            pass 
-            # LANZAR EXCEPTION
+            raise NotRequestOkError
         
         try:
             return request.json()
         except ValueError:
-            pass
-            # LANZAR UNA EXCEPTION
+            raise JsonError
 
         # VER SI EL REQUEST ESTA CORRECTO
         # SI NO ESTA CORRECTO, TOMAR UNA ACCION.

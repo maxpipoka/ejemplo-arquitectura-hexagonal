@@ -1,7 +1,8 @@
 """Auxiliar classes"""
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 import enum
+from typing import Dict
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,20 @@ class DebtProcessed:
     is_in_payment_plan: bool
     remaining_amount: float
     next_payment_due_date: date
+
+    def convert_to_dict(self) -> Dict:
+        return {
+            "id": self.debt.id,
+            "amount": self.debt.amount,
+            "is_in_payment_plan": self.is_in_payment_plan,
+            "remaining_amount": self.remaining_amount,
+            "next_payment_due_date": self._convert_date_to_string()
+        }
+
+    def _convert_date_to_string(self) -> str:
+        if self.next_payment_due_date is None:
+            return "null"
+        return self.next_payment_due_date.strftime("%Y-%m-%d")
 
 
 class PayFrequency(enum.Enum):

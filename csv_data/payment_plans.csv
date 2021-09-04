@@ -1,0 +1,5 @@
+amount_to_pay,debt_id,id,installment_amount,installment_frequency,start_date
+102.5,0,0,51.25,WEEKLY,2020-09-28
+100,1,1,25,WEEKLY,2020-08-01
+4920.34,2,2,1230.085,BI_WEEKLY,2020-01-01
+4312.67,3,3,1230.085,WEEKLY,2020-08-01
