@@ -1,9 +1,10 @@
-from app.adapter import JsonError, NotRequestOkError
+from app.adapter import JsonError, NotRequestOkError, csv_repository
 from app.domain.auxiliar_classes import DebtProcessed
 import json
 from typing import Dict, List
 from app.domain.service import ProcessDebtsService
 from app.adapter.api_repository import ApiRepository
+from app.adapter.csv_repository import CsvRepository
 
 
 def output(to_print: str) ->  None:
@@ -14,7 +15,8 @@ def convert_service_to_string(to_convert: List[DebtProcessed]) -> List[Dict]:
 
 
 def main() -> None:
-    repository = ApiRepository()
+    # repository = ApiRepository()
+    repository = CsvRepository()
 
     service = ProcessDebtsService(repository=repository)
     
